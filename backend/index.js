@@ -67,10 +67,15 @@ const allowedOriginsList = (process.env.CORS_ORIGINS || 'http://localhost:5173,h
     .map(o => o.trim())
     .filter(Boolean);
 const allowedOrigins = new Set(allowedOriginsList);
+const isAllowedOrigin = (origin) => {
+    if (!origin) return true;
+    if (allowedOrigins.has(origin)) return true;
+    return /^https:\/\/.*\.onrender\.com$/.test(origin);
+};
 
 app.use(cors({
     origin(origin, callback) {
-        if (!origin || allowedOrigins.has(origin)) {
+        if (isAllowedOrigin(origin)) {
             callback(null, true);
         } else {
             callback(new Error('Origin blocked by CORS'));

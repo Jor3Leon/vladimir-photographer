@@ -206,10 +206,11 @@ app.use('/uploads', express.static(UPLOADS_DIR));
 const DIST_PATH = path.join(__dirname, 'dist');
 if (fs.existsSync(DIST_PATH)) {
     app.use(express.static(DIST_PATH));
-    app.get('*', (req, res) => {
-        if (!req.path.startsWith('/api')) {
-            res.sendFile(path.join(DIST_PATH, 'index.html'));
+    app.use((req, res, next) => {
+        if (req.method !== 'GET' || req.path.startsWith('/api')) {
+            return next();
         }
+        return res.sendFile(path.join(DIST_PATH, 'index.html'));
     });
 }
 

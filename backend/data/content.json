@@ -1,0 +1,193 @@
+{
+    "hero": {
+        "name": "Vladimir",
+        "title": "Fotógrafo Profesional",
+        "description": "Capturando la esencia de cada momento con una mirada artística y técnica impecable. Especializado en retratos, arquitectura y eventos de alta gama.",
+        "image": "https://images.unsplash.com/photo-1542038784456-1ea8e935640e?q=80&w=2070&auto=format&fit=crop",
+        "cta": "Explora mi trabajo"
+    },
+    "about": {
+        "title": "Quién Soy",
+        "content": "Con más de 10 años de trayectoria, mi objetivo es transformar lo ordinario en extraordinario a través del lente. Mi enfoque se centra en la luz natural y las composiciones equilibradas que cuentan una historia profunda.",
+        "image": "https://images.unsplash.com/photo-1551232864-3f0890e580d9?q=80&w=1974&auto=format&fit=crop"
+    },
+    "skills": [
+        {
+            "name": "Retrato Editorial",
+            "level": 95
+        },
+        {
+            "name": "Fotografía de Arquitectura",
+            "level": 90
+        },
+        {
+            "name": "Post-producción Avanzada",
+            "level": 85
+        },
+        {
+            "name": "Iluminación de Estudio",
+            "level": 92
+        }
+    ],
+    "gallery": [
+        {
+            "id": 1,
+            "url": "https://images.unsplash.com/photo-1492633423870-43d1cd2775eb?q=80&w=2070&auto=format&fit=crop",
+            "category": "Retrato",
+            "title": "Esencia Natural"
+        },
+        {
+            "id": 2,
+            "url": "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2070&auto=format&fit=crop",
+            "category": "Arquitectura",
+            "title": "Estructuras Modernas"
+        },
+        {
+            "id": 3,
+            "url": "https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=2070&auto=format&fit=crop",
+            "category": "Eventos",
+            "title": "Celebraciones"
+        },
+        {
+            "id": 4,
+            "url": "https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=2070&auto=format&fit=crop",
+            "category": "Paisaje",
+            "title": "Naturaleza Viva"
+        }
+    ],
+    "categorized_gallery": [
+        {
+            "category": "Retrato",
+            "photos": [
+                {
+                    "id": 201,
+                    "url": "https://images.unsplash.com/photo-1492633423870-43d1cd2775eb?q=80&w=2070&auto=format&fit=crop",
+                    "title": "Inspiración"
+                }
+            ]
+        },
+        {
+            "category": "Eventos",
+            "photos": [
+                {
+                    "id": 202,
+                    "url": "https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=2070&auto=format&fit=crop",
+                    "title": "Boda"
+                },
+                {
+                    "id": 1772543675577,
+                    "url": "/uploads/1772543698136-435594124.jpeg",
+                    "title": ""
+                },
+                {
+                    "id": 1772543710225,
+                    "url": "/uploads/1772543739358-82786436.jpeg",
+                    "title": ""
+                },
+                {
+                    "id": 1772543744137,
+                    "url": "/uploads/1772543761903-708124734.jpeg",
+                    "title": ""
+                },
+                {
+                    "id": 1772543746793,
+                    "url": "/uploads/1772543768766-616323261.jpeg",
+                    "title": ""
+                },
+                {
+                    "id": 1772543747329,
+                    "url": "/uploads/1772543774011-610302175.jpeg",
+                    "title": ""
+                }
+            ]
+        },
+        {
+            "category": "Paisajes",
+            "photos": [
+                {
+                    "id": 203,
+                    "url": "https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=2070&auto=format&fit=crop",
+                    "title": "Atardecer"
+                }
+            ]
+        },
+        {
+            "category": "Arquitectura",
+            "photos": [
+                {
+                    "id": 204,
+                    "url": "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2070&auto=format&fit=crop",
+                    "title": "Estructuras"
+                }
+            ]
+        }
+    ],
+    "experiences": [
+        {
+            "year": "2023",
+            "title": "Exposición 'Luz y Sombra'",
+            "place": "Gallería Central"
+        },
+        {
+            "year": "2021",
+            "title": "Fotógrafo Principal",
+            "place": "Fashion Week Nacional"
+        },
+        {
+            "year": "2019",
+            "title": "Premio a la Excelencia",
+            "place": "Asociación de Fotógrafos"
+        }
+    ],
+    "plans": [
+        {
+            "id": 1,
+            "name": "Básico",
+            "price": "$150",
+            "badge": null,
+            "image": "https://images.unsplash.com/photo-1493863641943-9b68992a8d07?q=80&w=2058&auto=format&fit=crop",
+            "features": [
+                "2 horas de sesión",
+                "15 fotos editadas",
+                "Entrega digital"
+            ]
+        },
+        {
+            "id": 2,
+            "name": "Premium",
+            "price": "$350",
+            "badge": null,
+            "image": "https://images.unsplash.com/photo-1511285560929-80b456fea0bc?q=80&w=2069&auto=format&fit=crop",
+            "features": [
+                "5 horas de sesión",
+                "40 fotos editadas",
+                "Álbum impreso",
+                "Video corto"
+            ]
+        },
+        {
+            "id": 3,
+            "name": "Elite",
+            "price": "$700",
+            "badge": "10%",
+            "image": "https://images.unsplash.com/photo-1505373877841-8d25f7d46678?q=80&w=2012&auto=format&fit=crop",
+            "features": [
+                "Sesión ilimitada",
+                "Todas las fotos editadas",
+                "Dron incluido",
+                "Asistente"
+            ]
+        }
+    ],
+    "contact": {
+        "email": "vladimir@photography.com",
+        "phone": "+57 3112359502",
+        "address": "Yopal, Colombia",
+        "social": {
+            "facebook": "https://facebook.com",
+            "instagram": "https://instagram.com",
+            "tiktok": "https://tiktok.com",
+            "whatsapp": "https://wa.me/34600000000"
+        }
+    }
+}

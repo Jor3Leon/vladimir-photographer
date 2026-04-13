@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vladimir | Fotografía Profesional</title>
+    <meta name="description" content="Landing page de Vladimir, fotógrafo profesional especializado en retratos y arquitectura de alta gama." />
+    <!-- Preload fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+    <!-- Tailwind play CDN for utility classes if needed (though I used mostly vanilla CSS/Inline) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: '#8b5e34',
+              secondary: '#d4a373',
+              accent: '#bc6c25',
+              surface: '#1e1610',
+              bg: '#120d09',
+            }
+          }
+        }
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,38 @@
+[
+    {
+        "name": "Jherson Rivera",
+        "email": "tecnicoyopal2020@gmail.com",
+        "message": "Prueba 01",
+        "id": "1771961770373",
+        "isSeen": true,
+        "status": "contacted",
+        "createdAt": "2026-02-24T19:36:10.374Z"
+    },
+    {
+        "name": "Jherson Rivera",
+        "email": "tecnicoyopal2020@gmail.com",
+        "message": "Pruebas 001",
+        "id": "1771961974462",
+        "isSeen": true,
+        "status": "contacted",
+        "createdAt": "2026-02-24T19:39:34.463Z"
+    },
+    {
+        "name": "tati",
+        "email": "sdsdakd@sfkjd.com",
+        "message": "sdsd",
+        "id": "1771970682186",
+        "isSeen": true,
+        "status": "not_contacted",
+        "createdAt": "2026-02-24T22:04:42.186Z"
+    },
+    {
+        "name": "pepito",
+        "email": "jherson.rivera@cun.edu.co",
+        "message": "Hola Vladimir, estoy interesado en reservar el Plan Premium. ¿Podrías darme más información?",
+        "id": "1772483813222",
+        "isSeen": false,
+        "status": "not_contacted",
+        "createdAt": "2026-03-02T20:36:53.222Z"
+    }
+]

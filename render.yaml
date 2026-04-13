@@ -1,0 +1,8 @@
+services:
+  - type: web
+    name: vladimir-photographer
+    env: node
+    plan: free
+    buildCommand: npm run deploy
+    startCommand: npm run start
+    autoDeploy: true

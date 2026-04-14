@@ -23,9 +23,7 @@ API para contenido del portafolio, panel admin y formulario de contacto.
 - `ADMIN_PASSWORD_HASH=<hash_pbkdf2>`
 - `AUTH_TOKEN_TTL_SECONDS=28800`
 - `CORS_ORIGINS=https://tu-dominio.com,http://localhost:5173`
-- `CLOUDINARY_CLOUD_NAME=...`
-- `CLOUDINARY_API_KEY=...`
-- `CLOUDINARY_API_SECRET=...`
+- `CLOUDINARY_URL=cloudinary://<api_key>:<api_secret>@<cloud_name>`
 
 ## Generar hash del password admin
 ```bash

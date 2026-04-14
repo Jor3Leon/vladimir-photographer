@@ -18,11 +18,16 @@ Recommended flow on Render:
 2. Use `render.yaml` or create a new Web Service manually.
 3. Set the build command to `npm run deploy`.
 4. Set the start command to `npm run start`.
-5. Leave `PORT` to the platform.
+5. Set these environment variables in Render:
+   - `CLOUDINARY_URL`
+   - `MONGODB_URI`
+   - `AUTH_SECRET`
+   - `ADMIN_PASSWORD`
+6. Leave `PORT` to the platform or keep it at `5000`.
 
-The app can run without MongoDB or Cloudinary if you leave those env vars empty:
+The app can run without MongoDB if you leave that env var empty:
 - it falls back to local JSON files for content and messages
-- it falls back to local uploads in `backend/uploads`
+- image uploads should use Cloudinary in production via `CLOUDINARY_URL`
 
 ## Notes
 - Backend runs on `http://localhost:5000`.
@@ -34,7 +39,7 @@ The app can run without MongoDB or Cloudinary if you leave those env vars empty:
 ## Estructura del proyecto
 - `backend/`: API, autenticacion admin, subida de imagenes y fallback JSON.
 - `backend/data/`: respaldo local para `content.json` y `messages.json` cuando no hay DB.
-- `backend/uploads/`: subida local cuando Cloudinary no esta configurado.
+- `backend/uploads/`: cache local de desarrollo para migrar contenido a Cloudinary.
 - `frontend/`: app React + Vite (landing, panel admin y galeria).
 - `frontend/src/data/content.json`: contenido inicial para el panel admin.
 - `frontend/public/`: assets estaticos fuente (se copian a `dist` en build).

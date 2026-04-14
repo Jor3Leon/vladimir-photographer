@@ -1,32 +1,30 @@
-# 🚀 Guía de Despliegue Simplificada - Vladimir Photography
+# Guia de Despliegue Simplificada - Vladimir Photography
 
-El proyecto ha sido optimizado para desplegarse como una **única unidad** (Frontend + Backend juntos).
+El proyecto esta preparado para desplegarse como una sola unidad: frontend y backend juntos.
 
-## 1. Requisitos Previos
-*   Cuenta en **GitHub**.
-*   Cuenta en **Render.com** (o Railway.app).
-*   Cuenta en **Cloudinary** (Para fotos persistentes).
-*   Cuenta en **MongoDB Atlas** (Para texto persistente).
+## Requisitos Previos
+- Cuenta en GitHub
+- Cuenta en Render.com
+- Cuenta en Cloudinary
+- Cuenta en MongoDB Atlas
 
-## 2. Configuración en Render.com (Recomendado)
+## Configuracion en Render
 
-1. **Crear un nuevo "Web Service"** y conectar tu repositorio de GitHub.
-2. **Configuración del Proyecto**:
-   *   **Runtime**: `Node`
-   *   **Build Command**: `npm install && npm run build && cd server && npm install`
-   *   **Start Command**: `npm start`
-3. **Variables de Entorno (Environment Variables)**:
-   Añade las siguientes variables en Render:
-   * `PORT`: `5000`
-   * `CLOUDINARY_CLOUD_NAME`: (Tu dato de Cloudinary)
-   * `CLOUDINARY_API_KEY`: (Tu dato de Cloudinary)
-   * `CLOUDINARY_API_SECRET`: (Tu dato de Cloudinary)
-   * `MONGODB_URI`: (Tu enlace de conexión de MongoDB Atlas)
+1. Crea un nuevo Web Service y conecta tu repositorio.
+2. Usa estas opciones:
+   - Runtime: `Node`
+   - Build Command: `npm run deploy`
+   - Start Command: `npm run start`
+3. Agrega estas variables de entorno:
+   - `PORT`: `5000`
+   - `CLOUDINARY_URL`: `cloudinary://API_KEY:API_SECRET@dzn3i9vlh`
+   - `MONGODB_URI`: tu cadena de conexion de MongoDB Atlas
+   - `AUTH_SECRET`: una cadena larga aleatoria
+   - `ADMIN_PASSWORD`: la contrasena del panel
 
-## 3. Beneficios de esta configuración
-*   **Un solo servicio**: No necesitas pagar o configurar dos servicios distintos para el cliente y el servidor.
-*   **Fácil mantenimiento**: El servidor sirve automáticamente la versión más reciente del frontend después de cada build.
-*   **Rutas SPA**: El servidor maneja correctamente las rutas de React (como `/admin` o `/galeria`) incluso al refrescar la página.
+## Beneficios
 
----
-*Guía actualizada por tu asistente Antigravity.*
+- Un solo servicio para toda la app
+- El frontend queda servido desde el mismo backend
+- Las rutas SPA como `/admin` y `/galeria` funcionan al recargar
+

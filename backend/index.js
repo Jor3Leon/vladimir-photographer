@@ -21,6 +21,10 @@ const Message = require('./models/Message');
 const app = express();
 const PORT = Number(process.env.PORT) || 5000;
 const NODE_ENV = process.env.NODE_ENV || 'development';
+const upload = multer({
+    storage: multer.memoryStorage(),
+    limits: { fileSize: 5 * 1024 * 1024 }
+});
 
 // --- Configuración de Entorno y Seguridad ---
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/vladimir_portfolio';
@@ -30,6 +34,31 @@ const TOKEN_TTL_SECONDS = Number(process.env.AUTH_TOKEN_TTL_SECONDS) || 8 * 60 *
 
 // Secreto para firmar los tokens de sesión
 const TOKEN_SECRET = process.env.AUTH_SECRET || process.env.JWT_SECRET || crypto.randomBytes(32).toString('hex');
+
+function getCloudinaryConfig() {
+    const url = process.env.CLOUDINARY_URL;
+    if (url) {
+        const match = url.match(/^cloudinary:\/\/([^:]+):([^@]+)@(.+)$/);
+        if (match) {
+            return {
+                cloud_name: match[3],
+                api_key: match[1],
+                api_secret: match[2]
+            };
+        }
+    }
+
+    const { CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET } = process.env;
+    if (CLOUDINARY_CLOUD_NAME && CLOUDINARY_API_KEY && CLOUDINARY_API_SECRET) {
+        return {
+            cloud_name: CLOUDINARY_CLOUD_NAME,
+            api_key: CLOUDINARY_API_KEY,
+            api_secret: CLOUDINARY_API_SECRET
+        };
+    }
+
+    return null;
+}
 
 // --- Configuración de la Base de Datos ---
 let isUsingDB = false;
@@ -45,11 +74,10 @@ mongoose.connect(MONGODB_URI)
     });
 
 // --- Configuración opcional de Cloudinary ---
-cloudinary.config({
-    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-    api_key: process.env.CLOUDINARY_API_KEY,
-    api_secret: process.env.CLOUDINARY_API_SECRET
-});
+const cloudinaryConfig = getCloudinaryConfig();
+if (cloudinaryConfig) {
+    cloudinary.config(cloudinaryConfig);
+}
 
 // --- Middlewares Globales ---
 
@@ -197,6 +225,49 @@ app.post('/api/messages', async (req, res) => {
         res.json(newMessage);
     } catch (err) {
         res.status(500).json({ error: 'Error al enviar mensaje' });
+    }
+});
+
+app.post('/api/upload', requireAdmin, upload.single('image'), async (req, res) => {
+    if (!req.file) {
+        return res.status(400).json({ error: 'No se recibio ninguna imagen' });
+    }
+
+    try {
+        const cloudinaryReady = Boolean(getCloudinaryConfig());
+
+        if (cloudinaryReady) {
+            const result = await new Promise((resolve, reject) => {
+                const stream = cloudinary.uploader.upload_stream(
+                    {
+                        folder: 'vladimir-photographer',
+                        resource_type: 'image'
+                    },
+                    (error, uploadResult) => {
+                        if (error) return reject(error);
+                        resolve(uploadResult);
+                    }
+                );
+                stream.end(req.file.buffer);
+            });
+
+            return res.json({ url: result.secure_url, public_id: result.public_id });
+        }
+
+        if (NODE_ENV === 'production') {
+            return res.status(500).json({
+                error: 'Cloudinary no esta configurado en produccion'
+            });
+        }
+
+        const safeName = `${Date.now()}-${req.file.originalname}`.replace(/[^a-zA-Z0-9._-]/g, '_');
+        const filePath = path.join(UPLOADS_DIR, safeName);
+        await fs.writeFile(filePath, req.file.buffer);
+
+        return res.json({ url: `/uploads/${safeName}` });
+    } catch (err) {
+        console.error('Error al subir imagen:', err);
+        return res.status(500).json({ error: 'Error al subir imagen' });
     }
 });
 

@@ -10,7 +10,7 @@ services:
       - key: PORT
         value: 5000
       - key: CLOUDINARY_URL
-        sync: false
+        value: cloudinary://373123171552225:9pn1t_2t9tsBGf6P05K-gsRlFYk@dzn3i9vlh
       - key: MONGODB_URI
         sync: false
       - key: AUTH_SECRET

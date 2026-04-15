@@ -27,7 +27,8 @@ Recommended flow on Render:
 
 The app can run without MongoDB if you leave that env var empty:
 - it falls back to local JSON files for content and messages
-- image uploads should use Cloudinary in production via `CLOUDINARY_URL`
+- image uploads prefer Cloudinary in production via `CLOUDINARY_URL`
+- if Cloudinary is missing, uploads fall back to local storage as a temporary backup
 
 ## Notes
 - Backend runs on `http://localhost:5000`.

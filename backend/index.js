@@ -77,7 +77,10 @@ mongoose.connect(MONGODB_URI)
 const cloudinaryConfig = getCloudinaryConfig();
 if (cloudinaryConfig) {
     cloudinary.config(cloudinaryConfig);
+} else {
+    console.warn('Cloudinary no está configurado. Se usará almacenamiento local como respaldo.');
 }
+const hasCloudinaryConfig = Boolean(cloudinaryConfig);
 
 // --- Middlewares Globales ---
 
@@ -234,9 +237,7 @@ app.post('/api/upload', requireAdmin, upload.single('image'), async (req, res) =
     }
 
     try {
-        const cloudinaryReady = Boolean(getCloudinaryConfig());
-
-        if (cloudinaryReady) {
+        if (hasCloudinaryConfig) {
             const result = await new Promise((resolve, reject) => {
                 const stream = cloudinary.uploader.upload_stream(
                     {
@@ -255,9 +256,7 @@ app.post('/api/upload', requireAdmin, upload.single('image'), async (req, res) =
         }
 
         if (NODE_ENV === 'production') {
-            return res.status(500).json({
-                error: 'Cloudinary no esta configurado en produccion'
-            });
+            console.warn('Subida en producción sin Cloudinary configurado. Guardando en almacenamiento local temporal.');
         }
 
         const safeName = `${Date.now()}-${req.file.originalname}`.replace(/[^a-zA-Z0-9._-]/g, '_');

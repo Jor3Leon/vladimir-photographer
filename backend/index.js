@@ -34,6 +34,26 @@ const TOKEN_TTL_SECONDS = Number(process.env.AUTH_TOKEN_TTL_SECONDS) || 8 * 60 *
 
 // Secreto para firmar los tokens de sesión
 const TOKEN_SECRET = process.env.AUTH_SECRET || process.env.JWT_SECRET || crypto.randomBytes(32).toString('hex');
+const DEFAULT_VIDEOS = [
+    {
+        id: 301,
+        title: 'Video Principal',
+        url: 'https://www.youtube.com/embed/dQw4w9WgXcQ'
+    },
+    {
+        id: 302,
+        title: 'Video Secundario',
+        url: 'https://www.youtube.com/embed/aqz-KE-bpKQ'
+    }
+];
+
+function normalizeContentShape(content) {
+    if (!content) return content;
+    return {
+        ...content,
+        videos: Array.isArray(content.videos) ? content.videos : DEFAULT_VIDEOS
+    };
+}
 
 function getCloudinaryConfig() {
     const url = process.env.CLOUDINARY_URL;
@@ -176,10 +196,10 @@ app.get('/api/content', async (req, res) => {
     try {
         if (isUsingDB) {
             const data = await Content.findOne().sort({ createdAt: -1 });
-            return res.json(data);
+            return res.json(normalizeContentShape(data));
         }
         const data = await fs.readJson(path.join(__dirname, 'data/content.json'));
-        res.json(data);
+        res.json(normalizeContentShape(data));
     } catch (err) {
         res.status(500).json({ error: 'Error al obtener contenido' });
     }
@@ -188,11 +208,12 @@ app.get('/api/content', async (req, res) => {
 app.post('/api/content', requireAdmin, async (req, res) => {
     try {
         if (isUsingDB) {
-            const data = await Content.findOneAndUpdate({}, req.body, { upsert: true, new: true });
+            const data = await Content.findOneAndUpdate({}, normalizeContentShape(req.body), { upsert: true, new: true });
             return res.json(data);
         }
-        await fs.writeJson(path.join(__dirname, 'data/content.json'), req.body, { spaces: 4 });
-        res.json(req.body);
+        const normalized = normalizeContentShape(req.body);
+        await fs.writeJson(path.join(__dirname, 'data/content.json'), normalized, { spaces: 4 });
+        res.json(normalized);
     } catch (err) {
         res.status(500).json({ error: 'Error al guardar contenido' });
     }

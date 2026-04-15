@@ -19,6 +19,7 @@ const skeletonData = {
     skills: [],
     gallery: [],
     categorized_gallery: [],
+    videos: [],
     experiences: [],
     plans: [],
     contact: { email: '', phone: '', address: '', social: {} }
@@ -277,6 +278,13 @@ export default function Admin() {
         const newCats = [...data.categorized_gallery];
         newCats[catIndex].photos = newCats[catIndex].photos.filter((_, i) => i !== photoIndex);
         setData(prev => ({ ...prev, categorized_gallery: newCats }));
+    };
+
+    const addVideo = () => {
+        setData(prev => ({
+            ...prev,
+            videos: [...prev.videos, { id: Date.now(), title: '', url: '' }]
+        }));
     };
 
     // --- Renderizado: Control de Acceso (Login) ---
@@ -680,6 +688,71 @@ export default function Admin() {
 
                         {/* SECCIÓN MÁS COMPLEJA SI EXISTE MÁS CONTENIDO... */}
                         {/* El resto del código de la galería completa y planes se mantiene bajo el mismo esquema de documentación y organización visual */}
+
+                        {/* SECCIÓN: VIDEOS DESTACADOS */}
+                        <section className="mb-12">
+                            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-10">
+                                <h2 className="text-2xl font-bold flex items-center gap-4 uppercase tracking-[0.2em] text-[#d4a373]">
+                                    <div className="w-10 h-[2px] bg-[#8b5e34]"></div>
+                                    Videos Destacados
+                                </h2>
+                                <button
+                                    onClick={addVideo}
+                                    className="flex items-center gap-3 bg-[#8b5e34] px-8 py-3 rounded-full font-black uppercase text-[10px] tracking-widest shadow-xl shadow-[#8b5e34]/20 hover:scale-105 active:scale-95 transition-all"
+                                >
+                                    <Plus size={16} /> Añadir Video
+                                </button>
+                            </div>
+
+                            <div className="grid lg:grid-cols-2 gap-8">
+                                {data.videos.map((video, index) => (
+                                    <div key={index} className="bg-[#1e1610] p-5 rounded-[2rem] border border-white/10 shadow-2xl overflow-hidden">
+                                        <div className="flex items-center justify-between gap-4 mb-4">
+                                            <input
+                                                className="flex-1 bg-[#120d09] border border-white/5 p-3 rounded-xl text-sm font-bold outline-none focus:border-[#8b5e34] transition-colors"
+                                                placeholder="Título del video"
+                                                value={video.title}
+                                                onChange={(e) => updateItem('videos', index, 'title', e.target.value)}
+                                            />
+                                            <button
+                                                onClick={() => removeItem('videos', index)}
+                                                className="text-white/10 hover:text-red-500 transition-colors bg-white/5 p-3 rounded-xl"
+                                            >
+                                                <Trash2 size={16} />
+                                            </button>
+                                        </div>
+
+                                        <div className="space-y-4">
+                                            <div className="aspect-video rounded-2xl overflow-hidden border border-white/5 bg-black">
+                                                {video.url ? (
+                                                    <iframe
+                                                        src={video.url}
+                                                        title={video.title || `Video ${index + 1}`}
+                                                        className="w-full h-full"
+                                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                                        allowFullScreen
+                                                    />
+                                                ) : (
+                                                    <div className="flex items-center justify-center h-full text-white/10 text-xs uppercase tracking-widest">
+                                                        Pega la URL del video
+                                                    </div>
+                                                )}
+                                            </div>
+
+                                            <input
+                                                className="w-full bg-black/40 border border-white/5 p-3 rounded-xl text-[10px] font-mono outline-none focus:border-[#8b5e34]"
+                                                placeholder="URL del video embebible"
+                                                value={video.url}
+                                                onChange={(e) => updateItem('videos', index, 'url', e.target.value)}
+                                            />
+                                            <p className="text-[10px] text-white/25 uppercase tracking-[0.18em] leading-relaxed">
+                                                Usa una URL embebible de YouTube, Vimeo o un archivo directo `.mp4`.
+                                            </p>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </section>
                         
                         {/* GESTIÓN DE CATEGORÍAS (Galería Completa) */}
                         <section className="mb-12">

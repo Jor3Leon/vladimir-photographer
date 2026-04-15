@@ -14,6 +14,7 @@ import Navbar from './components/layout/Navbar';
 import Hero from './components/sections/Hero';
 import About from './components/sections/About';
 import Gallery from './components/sections/Gallery';
+import Videos from './components/sections/Videos';
 import Plans from './components/sections/Plans';
 import Contact from './components/sections/Contact';
 import Social3DIcons from './components/ui/SocialIcons';
@@ -88,6 +89,9 @@ export default function Landing() {
 
         {/* Sección de Portafolio / Galería */}
         <Gallery photos={content.gallery} />
+
+        {/* Sección de Videos Destacados */}
+        <Videos videos={Array.isArray(content.videos) ? content.videos : []} />
 
         {/* Sección de Experiencia Profesional */}
         <div className="container mx-auto px-6 py-24">

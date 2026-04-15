@@ -122,6 +122,18 @@
             ]
         }
     ],
+    "videos": [
+        {
+            "id": 301,
+            "title": "Video Principal",
+            "url": "https://www.youtube.com/embed/dQw4w9WgXcQ"
+        },
+        {
+            "id": 302,
+            "title": "Video Secundario",
+            "url": "https://www.youtube.com/embed/aqz-KE-bpKQ"
+        }
+    ],
     "experiences": [
         {
             "year": "2023",

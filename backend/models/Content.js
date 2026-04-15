@@ -37,6 +37,12 @@ const ContentSchema = new mongoose.Schema({
             title: String
         }]
     }],
+    // Video section shown between gallery and experience
+    videos: [{
+        id: Number,
+        title: String,
+        url: String
+    }],
     // Timeline / experience section
     experiences: [{
         year: String,

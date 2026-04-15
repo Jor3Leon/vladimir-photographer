@@ -8,7 +8,7 @@ function normalizeVideoUrl(url) {
   const trimmed = url.trim();
   if (!trimmed) return '';
 
-  if (/\.mp4(\?.*)?$/i.test(trimmed)) {
+  if (/\.(mp4|webm|ogg|mov)(\?.*)?$/i.test(trimmed)) {
     return trimmed;
   }
 
@@ -28,6 +28,28 @@ function normalizeVideoUrl(url) {
       const videoId = parsed.searchParams.get('v');
       return videoId ? `https://www.youtube-nocookie.com/embed/${videoId}?rel=0&modestbranding=1` : trimmed;
     }
+
+    if (parsed.hostname.includes('vimeo.com')) {
+      const match = parsed.pathname.match(/\/(\d+)/);
+      return match ? `https://player.vimeo.com/video/${match[1]}` : trimmed;
+    }
+
+    if (parsed.hostname.includes('drive.google.com')) {
+      const fileMatch = parsed.pathname.match(/\/file\/d\/([^/]+)/);
+      if (fileMatch) {
+        return `https://drive.google.com/file/d/${fileMatch[1]}/preview`;
+      }
+
+      const id = parsed.searchParams.get('id');
+      return id ? `https://drive.google.com/file/d/${id}/preview` : trimmed;
+    }
+
+    if (parsed.hostname.includes('dropbox.com')) {
+      const nextUrl = new URL(trimmed);
+      nextUrl.searchParams.delete('dl');
+      nextUrl.searchParams.set('raw', '1');
+      return nextUrl.toString();
+    }
   } catch {
     return trimmed;
   }
@@ -36,8 +58,9 @@ function normalizeVideoUrl(url) {
 }
 
 function getVideoKind(url) {
-  if (/\.mp4(\?.*)?$/i.test(url)) return 'file';
+  if (/\.(mp4|webm|ogg|mov)(\?.*)?$/i.test(url)) return 'file';
   if (url.includes('youtube.com') || url.includes('youtu.be')) return 'youtube';
+  if (url.includes('vimeo.com') || url.includes('drive.google.com') || url.includes('dropbox.com')) return 'embed';
   return 'external';
 }
 
@@ -75,7 +98,7 @@ function VideoFrame({ video, index }) {
             playsInline
             className="w-full h-full object-cover"
           />
-        ) : kind === 'youtube' ? (
+        ) : kind === 'youtube' || kind === 'embed' ? (
           <iframe
             src={resolvedUrl}
             title={video.title || `Video ${index + 1}`}

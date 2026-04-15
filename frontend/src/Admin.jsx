@@ -743,12 +743,12 @@ export default function Admin() {
 
                                             <input
                                                 className="w-full bg-black/40 border border-white/5 p-3 rounded-xl text-[10px] font-mono outline-none focus:border-[#8b5e34]"
-                                                placeholder="URL del video embebible"
+                                                placeholder="URL de YouTube, Vimeo, Drive o video directo"
                                                 value={video.url}
                                                 onChange={(e) => updateItem('videos', index, 'url', e.target.value)}
                                             />
                                             <p className="text-[10px] text-white/25 uppercase tracking-[0.18em] leading-relaxed">
-                                                Usa una URL embebible de YouTube, Vimeo o un archivo directo `.mp4`.
+                                                Usa YouTube, Vimeo, Google Drive, Dropbox o un archivo directo `.mp4`, `.webm`, `.ogg` o `.mov`.
                                             </p>
                                         </div>
                                     </div>

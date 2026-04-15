@@ -123,8 +123,10 @@ function YouTubeThumb({ video, resolvedUrl }) {
 
 function VideoFrame({ video, index }) {
   const resolvedUrl = normalizeVideoUrl(video.url);
-  const kind = getVideoKind(video.url || '');
+  const rawUrl = video.url || '';
+  const kind = getVideoKind(rawUrl);
   const isVideoFile = kind === 'file';
+  const hasYouTubeId = Boolean(getYouTubeId(rawUrl) || getYouTubeId(resolvedUrl));
 
   return (
     <motion.div
@@ -142,7 +144,7 @@ function VideoFrame({ video, index }) {
             playsInline
             className="w-full h-full object-cover"
           />
-        ) : kind === 'youtube' ? (
+        ) : hasYouTubeId ? (
           <YouTubeThumb video={video} resolvedUrl={resolvedUrl} />
         ) : kind === 'embed' ? (
           <iframe
@@ -152,17 +154,7 @@ function VideoFrame({ video, index }) {
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
             allowFullScreen
           />
-        ) : (
-          <a
-            href={resolvedUrl}
-            target="_blank"
-            rel="noreferrer"
-            className="w-full h-full flex items-center justify-center bg-black"
-          >
-            <span className="sr-only">Abrir video</span>
-            <ExternalLink size={18} className="text-white/10" />
-          </a>
-        )}
+        ) : null}
       </div>
     </motion.div>
   );

@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { ExternalLink, Film, PlayCircle } from 'lucide-react';
+import { ExternalLink } from 'lucide-react';
 
 function normalizeVideoUrl(url) {
   if (!url) return '';
@@ -77,19 +77,6 @@ function VideoFrame({ video, index }) {
       viewport={{ once: true }}
       className="bg-[#1e1610] border border-white/10 rounded-[2rem] overflow-hidden shadow-2xl"
     >
-      <div className="p-5 md:p-6 border-b border-white/5 flex items-center justify-between gap-4">
-        <div>
-          <p className="text-white/45 text-[10px] uppercase tracking-[0.3em] mb-2 flex items-center gap-2">
-            <Film size={12} />
-            Video {index + 1}
-          </p>
-          <h3 className="text-xl md:text-2xl font-bold uppercase tracking-tight">
-            {video.title || `Presentación ${index + 1}`}
-          </h3>
-        </div>
-        <PlayCircle className="text-white/35" size={28} />
-      </div>
-
       <div className="aspect-video bg-black">
         {isVideoFile ? (
           <video
@@ -140,9 +127,6 @@ export default function Videos({ videos = [] }) {
               Videos <span className="text-stroke text-transparent">Destacados</span>
             </h2>
           </div>
-          <p className="max-w-2xl text-white/50 leading-relaxed">
-            Si el video no permite incrustarse, el panel te mostrará un enlace directo para abrirlo fuera del sitio.
-          </p>
         </div>
 
         <div className="grid lg:grid-cols-2 gap-8">

@@ -47,11 +47,57 @@ const DEFAULT_VIDEOS = [
     }
 ];
 
+function normalizeVideoUrl(url) {
+    if (!url || typeof url !== 'string') return '';
+
+    const trimmed = url.trim();
+    if (!trimmed) return '';
+
+    if (/\.mp4(\?.*)?$/i.test(trimmed)) {
+        return trimmed;
+    }
+
+    try {
+        const parsed = new URL(trimmed);
+        if (parsed.hostname.includes('youtu.be')) {
+            const videoId = parsed.pathname.replace('/', '');
+            return videoId ? `https://www.youtube-nocookie.com/embed/${videoId}?rel=0&modestbranding=1` : trimmed;
+        }
+
+        if (parsed.hostname.includes('youtube.com')) {
+            if (parsed.pathname.startsWith('/embed/')) {
+                const videoId = parsed.pathname.split('/embed/')[1]?.split('/')[0];
+                return videoId ? `https://www.youtube-nocookie.com/embed/${videoId}?rel=0&modestbranding=1` : trimmed;
+            }
+
+            const videoId = parsed.searchParams.get('v');
+            return videoId ? `https://www.youtube-nocookie.com/embed/${videoId}?rel=0&modestbranding=1` : trimmed;
+        }
+    } catch {
+        return trimmed;
+    }
+
+    return trimmed;
+}
+
+function normalizeVideoList(videos) {
+    if (!Array.isArray(videos) || videos.length === 0) {
+        return DEFAULT_VIDEOS;
+    }
+
+    return videos.slice(0, 2).map((video, index) => ({
+        id: video?.id ?? Date.now() + index,
+        title: typeof video?.title === 'string' ? video.title : '',
+        url: normalizeVideoUrl(video?.url)
+    }));
+}
+
 function normalizeContentShape(content) {
     if (!content) return content;
+    const plainContent = typeof content.toObject === 'function' ? content.toObject() : content;
     return {
-        ...content,
-        videos: Array.isArray(content.videos) ? content.videos : DEFAULT_VIDEOS
+        ...plainContent,
+        videos: normalizeVideoList(plainContent.videos)
     };
 }
 

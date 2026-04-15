@@ -193,6 +193,8 @@ export default function Admin() {
             });
             if (response.status === 401) return handleUnauthorized();
             if (response.ok) {
+                const saved = await response.json();
+                setData(saved);
                 alert('Cambios guardados con éxito.');
             }
         } catch {

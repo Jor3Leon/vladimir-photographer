@@ -64,6 +64,63 @@ function getVideoKind(url) {
   return 'external';
 }
 
+function getYouTubeId(url) {
+  if (!url) return '';
+
+  try {
+    const parsed = new URL(url);
+    if (parsed.hostname.includes('youtu.be')) {
+      return parsed.pathname.replace('/', '');
+    }
+
+    if (parsed.hostname.includes('youtube.com') || parsed.hostname.includes('youtube-nocookie.com')) {
+      if (parsed.pathname.startsWith('/embed/')) {
+        return parsed.pathname.split('/embed/')[1]?.split('/')[0] || '';
+      }
+
+      return parsed.searchParams.get('v') || '';
+    }
+  } catch {
+    return '';
+  }
+
+  return '';
+}
+
+function YouTubeThumb({ video, resolvedUrl }) {
+  const videoId = getYouTubeId(video.url || resolvedUrl);
+  const thumbUrl = videoId ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg` : '';
+  const openUrl = video.url?.trim() || resolvedUrl;
+
+  return (
+    <a
+      href={openUrl}
+      target="_blank"
+      rel="noreferrer"
+      className="relative block w-full h-full group bg-black"
+    >
+      {thumbUrl ? (
+        <img
+          src={thumbUrl}
+          alt={video.title || 'Video'}
+          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+          loading="lazy"
+        />
+      ) : (
+        <div className="w-full h-full bg-black" />
+      )}
+      <div className="absolute inset-0 bg-black/30 group-hover:bg-black/20 transition-colors" />
+      <div className="absolute inset-0 flex items-center justify-center">
+        <div className="w-16 h-16 rounded-full border border-white/20 bg-black/40 backdrop-blur-md flex items-center justify-center shadow-2xl">
+          <svg viewBox="0 0 24 24" className="w-7 h-7 text-white/85 translate-x-0.5">
+            <path fill="currentColor" d="M8 5v14l11-7z" />
+          </svg>
+        </div>
+      </div>
+    </a>
+  );
+}
+
 function VideoFrame({ video, index }) {
   const resolvedUrl = normalizeVideoUrl(video.url);
   const kind = getVideoKind(video.url || '');
@@ -85,7 +142,9 @@ function VideoFrame({ video, index }) {
             playsInline
             className="w-full h-full object-cover"
           />
-        ) : kind === 'youtube' || kind === 'embed' ? (
+        ) : kind === 'youtube' ? (
+          <YouTubeThumb video={video} resolvedUrl={resolvedUrl} />
+        ) : kind === 'embed' ? (
           <iframe
             src={resolvedUrl}
             title={video.title || `Video ${index + 1}`}

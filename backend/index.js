@@ -31,6 +31,7 @@ const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/vladim
 const ADMIN_PASSWORD_HASH = process.env.ADMIN_PASSWORD_HASH || '';
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'Vlado26++'; // Contraseña por defecto en desarrollo
 const TOKEN_TTL_SECONDS = Number(process.env.AUTH_TOKEN_TTL_SECONDS) || 8 * 60 * 60;
+const CONTENT_PATH = path.join(__dirname, 'data/content.json');
 
 // Secreto para firmar los tokens de sesión
 const TOKEN_SECRET = process.env.AUTH_SECRET || process.env.JWT_SECRET || crypto.randomBytes(32).toString('hex');
@@ -264,9 +265,18 @@ app.get('/api/content', async (req, res) => {
     try {
         if (isUsingDB) {
             const data = await Content.findOne().sort({ createdAt: -1 });
-            return res.json(normalizeContentShape(data));
+            if (data) {
+                return res.json(normalizeContentShape(data));
+            }
+
+            const fallbackContent = await fs.readJson(CONTENT_PATH);
+            const normalizedFallback = normalizeContentShape(fallbackContent);
+            void Content.create(normalizedFallback).catch((err) => {
+                console.warn('No se pudo sembrar contenido inicial en MongoDB:', err.message);
+            });
+            return res.json(normalizedFallback);
         }
-        const data = await fs.readJson(path.join(__dirname, 'data/content.json'));
+        const data = await fs.readJson(CONTENT_PATH);
         res.json(normalizeContentShape(data));
     } catch (err) {
         res.status(500).json({ error: 'Error al obtener contenido' });
@@ -276,11 +286,15 @@ app.get('/api/content', async (req, res) => {
 app.post('/api/content', requireAdmin, async (req, res) => {
     try {
         if (isUsingDB) {
-            const data = await Content.findOneAndUpdate({}, normalizeContentShape(req.body), { upsert: true, new: true });
+            const data = await Content.findOneAndUpdate(
+                {},
+                { $set: normalizeContentShape(req.body) },
+                { upsert: true, new: true, setDefaultsOnInsert: true }
+            );
             return res.json(data);
         }
         const normalized = normalizeContentShape(req.body);
-        await fs.writeJson(path.join(__dirname, 'data/content.json'), normalized, { spaces: 4 });
+        await fs.writeJson(CONTENT_PATH, normalized, { spaces: 4 });
         res.json(normalized);
     } catch (err) {
         res.status(500).json({ error: 'Error al guardar contenido' });
@@ -384,4 +398,15 @@ app.listen(PORT, () => {
 });
 
 // Semilla inicial y directorios
-async function seedDatabase() { /* Lógica de semilla omitida para brevedad en documentación */ }
+async function seedDatabase() {
+    try {
+        const count = await Content.countDocuments();
+        if (count > 0) return;
+
+        const fallbackContent = await fs.readJson(CONTENT_PATH);
+        await Content.create(normalizeContentShape(fallbackContent));
+        console.log('Contenido inicial sembrado en MongoDB.');
+    } catch (err) {
+        console.warn('No se pudo sembrar el contenido inicial:', err.message);
+    }
+}

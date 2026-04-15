@@ -12,7 +12,7 @@ services:
       - key: CLOUDINARY_URL
         value: cloudinary://373123171552225:9pn1t_2t9tsBGf6P05K-gsRlFYk@dzn3i9vlh
       - key: MONGODB_URI
-        sync: false
+        value: mongodb+srv://tecnicoyopal2020_db_user:2B3L6BsA3ncWkn5z@cluster0.3hcmdpf.mongodb.net/vladimir_portfolio?retryWrites=true&w=majority&appName=Cluster0
       - key: AUTH_SECRET
         sync: false
       - key: ADMIN_PASSWORD

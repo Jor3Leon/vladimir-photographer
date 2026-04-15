@@ -1,32 +1,6 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { ExternalLink } from 'lucide-react';
-
-let youtubeApiPromise = null;
-
-function loadYouTubeApi() {
-  if (typeof window === 'undefined') return Promise.resolve(null);
-  if (window.YT && window.YT.Player) return Promise.resolve(window.YT);
-
-  if (!youtubeApiPromise) {
-    youtubeApiPromise = new Promise((resolve) => {
-      const existingScript = document.querySelector('script[data-youtube-iframe-api="true"]');
-      if (existingScript) {
-        window.onYouTubeIframeAPIReady = () => resolve(window.YT);
-        return;
-      }
-
-      window.onYouTubeIframeAPIReady = () => resolve(window.YT);
-      const script = document.createElement('script');
-      script.src = 'https://www.youtube.com/iframe_api';
-      script.async = true;
-      script.setAttribute('data-youtube-iframe-api', 'true');
-      document.head.appendChild(script);
-    });
-  }
-
-  return youtubeApiPromise;
-}
+import { PlayCircle } from 'lucide-react';
 
 function normalizeVideoUrl(url) {
   if (!url) return '';
@@ -116,13 +90,9 @@ function getYouTubeId(url) {
 function YouTubeThumb({ video, resolvedUrl }) {
   const videoId = getYouTubeId(video.url || resolvedUrl);
   const thumbUrl = videoId ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg` : '';
-  const openUrl = video.url?.trim() || resolvedUrl;
 
   return (
-    <a
-      href={openUrl}
-      target="_blank"
-      rel="noreferrer"
+    <div
       className="relative block w-full h-full group bg-black"
     >
       {thumbUrl ? (
@@ -143,64 +113,14 @@ function YouTubeThumb({ video, resolvedUrl }) {
           </svg>
         </div>
       </div>
-    </a>
+    </div>
   );
 }
 
 function YouTubePlayer({ video, resolvedUrl }) {
-  const mountRef = useRef(null);
-  const playerRef = useRef(null);
   const [loadState, setLoadState] = useState('loading');
   const videoId = getYouTubeId(video.url || resolvedUrl);
   const thumbUrl = videoId ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg` : '';
-
-  useEffect(() => {
-    let cancelled = false;
-
-    const cleanup = () => {
-      if (playerRef.current && typeof playerRef.current.destroy === 'function') {
-        playerRef.current.destroy();
-      }
-      playerRef.current = null;
-    };
-
-    if (!videoId || !mountRef.current) {
-      setLoadState('error');
-      return cleanup;
-    }
-
-    setLoadState('loading');
-
-    loadYouTubeApi().then((YT) => {
-      if (cancelled || !YT || !mountRef.current) return;
-
-      cleanup();
-
-      playerRef.current = new YT.Player(mountRef.current, {
-        videoId,
-        playerVars: {
-          autoplay: 0,
-          controls: 1,
-          modestbranding: 1,
-          rel: 0,
-          playsinline: 1
-        },
-        events: {
-          onReady: () => {
-            if (!cancelled) setLoadState('ready');
-          },
-          onError: () => {
-            if (!cancelled) setLoadState('error');
-          }
-        }
-      });
-    });
-
-    return () => {
-      cancelled = true;
-      cleanup();
-    };
-  }, [videoId]);
 
   if (loadState === 'error') {
     return (
@@ -210,7 +130,15 @@ function YouTubePlayer({ video, resolvedUrl }) {
 
   return (
     <div className="relative w-full h-full bg-black">
-      <div ref={mountRef} className="w-full h-full" />
+      <iframe
+        src={resolvedUrl}
+        title={video.title || 'Video'}
+        className="absolute inset-0 w-full h-full"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+        allowFullScreen
+        onLoad={() => setLoadState('ready')}
+        onError={() => setLoadState('error')}
+      />
       {loadState === 'loading' && (
         <div className="absolute inset-0 bg-black/70">
           {thumbUrl ? (
@@ -222,11 +150,7 @@ function YouTubePlayer({ video, resolvedUrl }) {
             />
           ) : null}
           <div className="absolute inset-0 flex items-center justify-center">
-            <div className="w-16 h-16 rounded-full border border-white/20 bg-black/40 backdrop-blur-md flex items-center justify-center shadow-2xl">
-              <svg viewBox="0 0 24 24" className="w-7 h-7 text-white/85 translate-x-0.5">
-                <path fill="currentColor" d="M8 5v14l11-7z" />
-              </svg>
-            </div>
+            <PlayCircle className="w-16 h-16 text-white/80 drop-shadow-2xl" />
           </div>
         </div>
       )}

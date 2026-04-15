@@ -59,7 +59,7 @@ function normalizeVideoUrl(url) {
 
 function getVideoKind(url) {
   if (/\.(mp4|webm|ogg|mov)(\?.*)?$/i.test(url)) return 'file';
-  if (url.includes('youtube.com') || url.includes('youtu.be')) return 'youtube';
+  if (url.includes('youtube.com') || url.includes('youtu.be') || url.includes('youtube-nocookie.com')) return 'youtube';
   if (url.includes('vimeo.com') || url.includes('drive.google.com') || url.includes('dropbox.com')) return 'embed';
   return 'external';
 }
@@ -94,20 +94,15 @@ function VideoFrame({ video, index }) {
             allowFullScreen
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center p-6 text-center">
-            <div className="max-w-sm space-y-4">
-              <p className="text-white/70 font-semibold">No se puede incrustar esta URL directamente.</p>
-              <a
-                href={resolvedUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-white/10 text-white/80 hover:bg-white/10 transition-colors"
-              >
-                Abrir video
-                <ExternalLink size={14} />
-              </a>
-            </div>
-          </div>
+          <a
+            href={resolvedUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="w-full h-full flex items-center justify-center bg-black"
+          >
+            <span className="sr-only">Abrir video</span>
+            <ExternalLink size={18} className="text-white/10" />
+          </a>
         )}
       </div>
     </motion.div>

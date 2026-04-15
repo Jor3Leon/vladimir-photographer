@@ -18,8 +18,8 @@ const DiscountTag = ({ amount }) => (
           <span className="text-[8px] uppercase font-black text-white/70">OFERTA</span>
           <span className="text-sm font-black text-white">{amount}</span>
         </div>
-        <div className="absolute -right-2 bottom-2 w-6 h-6 bg-yellow-400 rounded-full border-2 border-yellow-200 shadow-md flex items-center justify-center">
-          <span className="text-yellow-800 text-[10px] font-black">$</span>
+        <div className="absolute -right-2 bottom-2 w-6 h-6 bg-white rounded-full border-2 border-white/80 shadow-md flex items-center justify-center">
+          <span className="text-red-700 text-[10px] font-black">$</span>
         </div>
       </div>
       <div className="absolute top-0 right-1/2 w-4 h-8 border-l-2 border-t-2 border-white/30 rounded-tl-full -translate-y-4"></div>
@@ -34,7 +34,7 @@ const DiscountTag = ({ amount }) => (
 const Plans = ({ plans, onSelectPlan }) => (
   <section id="servicios" className="py-24">
     <div className="container mx-auto px-6 text-center">
-      <h2 className="text-4xl font-bold mb-16 uppercase tracking-widest">Planes de Servicio</h2>
+      <h2 className="text-4xl font-bold mb-16 uppercase tracking-widest text-white/90">Planes de Servicio</h2>
       <div className="grid md:grid-cols-3 gap-8">
         {plans.map((plan, idx) => (
           <motion.div
@@ -43,23 +43,23 @@ const Plans = ({ plans, onSelectPlan }) => (
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: idx * 0.2 }}
-            className={`p-10 bg-[#120d09]/40 backdrop-blur-md rounded-3xl transition-all duration-700 relative overflow-visible group glow-border flex flex-col h-full ${plan.badge ? 'scale-105 glow-border-active shadow-[0_30px_60px_rgba(0,0,0,0.5),0_0_40px_rgba(139,94,52,0.2)]' : 'border border-white/5'}`}
+            className={`p-10 bg-[#120d09]/40 backdrop-blur-md rounded-3xl transition-all duration-700 relative overflow-visible group flex flex-col h-full border border-white/5 ${plan.badge ? 'scale-105 shadow-[0_30px_60px_rgba(0,0,0,0.45)]' : ''}`}
           >
             {/* Si el plan tiene oferta, mostrar etiqueta */}
             {plan.badge && <DiscountTag amount={plan.badge} />}
             
             {/* Contenido del Plan */}
             <div className="relative z-10 flex flex-col h-full">
-              <h3 className="text-3xl font-bold mb-2 tracking-tight group-hover:text-[#d4a373]">{plan.name}</h3>
-              <div className="text-5xl font-bold text-[#d4a373] mb-8 price flex items-baseline justify-center gap-1">
-                <span className="text-2xl font-light opacity-50">$</span>
+              <h3 className="text-3xl font-bold mb-2 tracking-tight text-white/95">{plan.name}</h3>
+              <div className="text-5xl font-bold text-white/90 mb-8 price flex items-baseline justify-center gap-1">
+                <span className="text-2xl font-light opacity-40">$</span>
                 {plan.price.replace('$', '')}
               </div>
               <ul className="space-y-4 mb-12 text-white/70 flex-grow text-left">
                 {plan.features.map(f => (
                   <li key={f} className="flex items-center gap-3 text-sm">
-                    <div className="flex-shrink-0 w-5 h-5 rounded-full bg-[#8b5e34]/20 flex items-center justify-center">
-                      <ChevronRight size={12} className="text-[#8b5e34]" />
+                    <div className="flex-shrink-0 w-5 h-5 rounded-full bg-white/10 flex items-center justify-center">
+                      <ChevronRight size={12} className="text-white/70" />
                     </div>
                     <span>{f}</span>
                   </li>
@@ -67,7 +67,7 @@ const Plans = ({ plans, onSelectPlan }) => (
               </ul>
               <button
                 onClick={() => onSelectPlan(plan.name)}
-                className="w-full py-4 border border-white/10 group-hover:bg-[#8b5e34] group-hover:border-[#8b5e34] transition-all duration-300 uppercase text-xs font-bold tracking-[0.3em] backdrop-blur-sm rounded-xl mt-auto"
+                className="w-full py-4 border border-white/10 group-hover:bg-white/10 group-hover:border-white/20 transition-all duration-300 uppercase text-xs font-bold tracking-[0.3em] backdrop-blur-sm rounded-xl mt-auto text-white/90"
               >
                 Seleccionar Plan
               </button>

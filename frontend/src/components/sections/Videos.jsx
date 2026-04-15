@@ -1,6 +1,32 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { ExternalLink } from 'lucide-react';
+
+let youtubeApiPromise = null;
+
+function loadYouTubeApi() {
+  if (typeof window === 'undefined') return Promise.resolve(null);
+  if (window.YT && window.YT.Player) return Promise.resolve(window.YT);
+
+  if (!youtubeApiPromise) {
+    youtubeApiPromise = new Promise((resolve) => {
+      const existingScript = document.querySelector('script[data-youtube-iframe-api="true"]');
+      if (existingScript) {
+        window.onYouTubeIframeAPIReady = () => resolve(window.YT);
+        return;
+      }
+
+      window.onYouTubeIframeAPIReady = () => resolve(window.YT);
+      const script = document.createElement('script');
+      script.src = 'https://www.youtube.com/iframe_api';
+      script.async = true;
+      script.setAttribute('data-youtube-iframe-api', 'true');
+      document.head.appendChild(script);
+    });
+  }
+
+  return youtubeApiPromise;
+}
 
 function normalizeVideoUrl(url) {
   if (!url) return '';
@@ -121,6 +147,93 @@ function YouTubeThumb({ video, resolvedUrl }) {
   );
 }
 
+function YouTubePlayer({ video, resolvedUrl }) {
+  const mountRef = useRef(null);
+  const playerRef = useRef(null);
+  const [loadState, setLoadState] = useState('loading');
+  const videoId = getYouTubeId(video.url || resolvedUrl);
+  const thumbUrl = videoId ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg` : '';
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const cleanup = () => {
+      if (playerRef.current && typeof playerRef.current.destroy === 'function') {
+        playerRef.current.destroy();
+      }
+      playerRef.current = null;
+    };
+
+    if (!videoId || !mountRef.current) {
+      setLoadState('error');
+      return cleanup;
+    }
+
+    setLoadState('loading');
+
+    loadYouTubeApi().then((YT) => {
+      if (cancelled || !YT || !mountRef.current) return;
+
+      cleanup();
+
+      playerRef.current = new YT.Player(mountRef.current, {
+        videoId,
+        playerVars: {
+          autoplay: 0,
+          controls: 1,
+          modestbranding: 1,
+          rel: 0,
+          playsinline: 1
+        },
+        events: {
+          onReady: () => {
+            if (!cancelled) setLoadState('ready');
+          },
+          onError: () => {
+            if (!cancelled) setLoadState('error');
+          }
+        }
+      });
+    });
+
+    return () => {
+      cancelled = true;
+      cleanup();
+    };
+  }, [videoId]);
+
+  if (loadState === 'error') {
+    return (
+      <YouTubeThumb video={video} resolvedUrl={resolvedUrl} />
+    );
+  }
+
+  return (
+    <div className="relative w-full h-full bg-black">
+      <div ref={mountRef} className="w-full h-full" />
+      {loadState === 'loading' && (
+        <div className="absolute inset-0 bg-black/70">
+          {thumbUrl ? (
+            <img
+              src={thumbUrl}
+              alt={video.title || 'Video'}
+              className="w-full h-full object-cover opacity-35"
+              loading="lazy"
+            />
+          ) : null}
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="w-16 h-16 rounded-full border border-white/20 bg-black/40 backdrop-blur-md flex items-center justify-center shadow-2xl">
+              <svg viewBox="0 0 24 24" className="w-7 h-7 text-white/85 translate-x-0.5">
+                <path fill="currentColor" d="M8 5v14l11-7z" />
+              </svg>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function VideoFrame({ video, index }) {
   const resolvedUrl = normalizeVideoUrl(video.url);
   const rawUrl = video.url || '';
@@ -145,7 +258,7 @@ function VideoFrame({ video, index }) {
             className="w-full h-full object-cover"
           />
         ) : hasYouTubeId ? (
-          <YouTubeThumb video={video} resolvedUrl={resolvedUrl} />
+          <YouTubePlayer video={video} resolvedUrl={resolvedUrl} />
         ) : kind === 'embed' ? (
           <iframe
             src={resolvedUrl}

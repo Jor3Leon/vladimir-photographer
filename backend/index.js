@@ -104,12 +104,16 @@ function normalizeVideoUrl(url) {
 }
 
 function normalizeVideoList(videos) {
-    if (!Array.isArray(videos) || videos.length === 0) {
-        return DEFAULT_VIDEOS;
+    if (!Array.isArray(videos)) {
+        return [];
     }
 
-    return videos.slice(0, 2).map((video, index) => ({
-        id: video?.id ?? Date.now() + index,
+    // Ya no limitamos a 2 videos, permitimos que el usuario guarde los que desee.
+    // Solo restauramos los preventivos si realmente no hay nada y es la primera vez.
+    if (videos.length === 0) return [];
+
+    return videos.map((video, index) => ({
+        id: video?.id || (Date.now() + index),
         title: typeof video?.title === 'string' ? video.title : '',
         url: normalizeVideoUrl(video?.url)
     }));
@@ -150,16 +154,18 @@ function getCloudinaryConfig() {
 }
 
 // --- Configuración de la Base de Datos ---
-let isUsingDB = false;
+// Usamos una función para verificar el estado real de la conexión en cada operación
+const isUsingDB = () => mongoose.connection.readyState === 1;
+
 mongoose.connect(MONGODB_URI)
     .then(() => {
-        console.log('Conectado a MongoDB local/remoto con éxito.');
-        isUsingDB = true;
+        console.log('✅ Conexión establecida con MongoDB.');
         seedDatabase(); // Poblar DB si está vacía
     })
     .catch((err) => {
-        console.warn('Fallo de conexión a MongoDB. Usando archivos JSON locales como respaldo:', err.message);
-        isUsingDB = false;
+        console.error('❌ ERROR: No se pudo conectar a MongoDB. Los cambios serán EFÍMEROS y se perderán si el servidor se reinicia.');
+        console.warn('Detalle del error:', err.message);
+        console.info('Sugerencia: Configura la variable de entorno MONGODB_URI para persistencia real.');
     });
 
 // --- Configuración opcional de Cloudinary ---
@@ -263,12 +269,13 @@ app.get('/api/auth/session', requireAdmin, (req, res) => res.json({ ok: true }))
 // Rutas de Contenido (Hero, About, etc.)
 app.get('/api/content', async (req, res) => {
     try {
-        if (isUsingDB) {
-            const data = await Content.findOne().sort({ createdAt: -1 });
+        if (isUsingDB()) {
+            const data = await Content.findOne().sort({ updatedAt: -1 });
             if (data) {
                 return res.json(normalizeContentShape(data));
             }
 
+            console.log('DB vacía, intentando cargar desde JSON inicial...');
             const fallbackContent = await fs.readJson(CONTENT_PATH);
             const normalizedFallback = normalizeContentShape(fallbackContent);
             void Content.create(normalizedFallback).catch((err) => {
@@ -276,27 +283,35 @@ app.get('/api/content', async (req, res) => {
             });
             return res.json(normalizedFallback);
         }
+        
+        console.warn('⚠️ Leyendo contenido desde JSON (Modo efímero)');
         const data = await fs.readJson(CONTENT_PATH);
         res.json(normalizeContentShape(data));
     } catch (err) {
+        console.error('Error al obtener contenido:', err);
         res.status(500).json({ error: 'Error al obtener contenido' });
     }
 });
 
 app.post('/api/content', requireAdmin, async (req, res) => {
     try {
-        if (isUsingDB) {
+        const normalized = normalizeContentShape(req.body);
+
+        if (isUsingDB()) {
             const data = await Content.findOneAndUpdate(
                 {},
-                { $set: normalizeContentShape(req.body) },
+                { $set: normalized },
                 { upsert: true, new: true, setDefaultsOnInsert: true }
             );
+            console.log('✅ Contenido guardado en MongoDB con éxito');
             return res.json(data);
         }
-        const normalized = normalizeContentShape(req.body);
+        
+        console.warn('⚠️ Guardando contenido en JSON local. Si estás en Render/Heroku, esto se perderá al reiniciar.');
         await fs.writeJson(CONTENT_PATH, normalized, { spaces: 4 });
         res.json(normalized);
     } catch (err) {
+        console.error('Error al guardar contenido:', err);
         res.status(500).json({ error: 'Error al guardar contenido' });
     }
 });

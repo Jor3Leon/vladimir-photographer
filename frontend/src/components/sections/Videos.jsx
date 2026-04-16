@@ -287,7 +287,7 @@ export default function Videos({ videos = [] }) {
       <div className="container mx-auto px-6">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-14">
           <div>
-            <span className="text-white/45 tracking-[0.2em] uppercase mb-2 block">Multimedia</span>
+            <span className="text-[#d4a373] tracking-[0.2em] uppercase mb-2 block">Multimedia</span>
             <h2 className="text-5xl font-bold uppercase">
               Videos <span className="text-stroke text-transparent">Destacados</span>
             </h2>
@@ -295,7 +295,7 @@ export default function Videos({ videos = [] }) {
         </div>
 
         <div className="grid lg:grid-cols-2 gap-8">
-          {videos.slice(0, 2).map((video, index) => (
+          {videos.map((video, index) => (
             <VideoFrame key={video.id ?? index} video={video} index={index} />
           ))}
         </div>

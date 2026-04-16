@@ -35,6 +35,7 @@ const CONTENT_PATH = path.join(__dirname, 'data/content.json');
 
 // Secreto para firmar los tokens de sesión
 const TOKEN_SECRET = process.env.AUTH_SECRET || process.env.JWT_SECRET || crypto.randomBytes(32).toString('hex');
+const SINGLE_CONTENT_ID = '000000000000000000000001'; // ID fijo para asegurar que solo exista un documento de contenido
 const DEFAULT_VIDEOS = [
     {
         id: 301,
@@ -270,17 +271,25 @@ app.get('/api/auth/session', requireAdmin, (req, res) => res.json({ ok: true }))
 app.get('/api/content', async (req, res) => {
     try {
         if (isUsingDB()) {
-            const data = await Content.findOne().sort({ updatedAt: -1 });
+            // Buscamos específicamente el documento con nuestro ID fijo
+            const data = await Content.findOne({ _id: SINGLE_CONTENT_ID });
             if (data) {
                 return res.json(normalizeContentShape(data));
             }
 
-            console.log('DB vacía, intentando cargar desde JSON inicial...');
+            console.log('DB vacía, intentando cargar y sembrar desde JSON inicial...');
             const fallbackContent = await fs.readJson(CONTENT_PATH);
             const normalizedFallback = normalizeContentShape(fallbackContent);
-            void Content.create(normalizedFallback).catch((err) => {
+            
+            // Sembramos usando el ID fijo
+            void Content.findOneAndUpdate(
+                { _id: SINGLE_CONTENT_ID },
+                { $set: normalizedFallback },
+                { upsert: true }
+            ).catch((err) => {
                 console.warn('No se pudo sembrar contenido inicial en MongoDB:', err.message);
             });
+            
             return res.json(normalizedFallback);
         }
         
@@ -298,12 +307,13 @@ app.post('/api/content', requireAdmin, async (req, res) => {
         const normalized = normalizeContentShape(req.body);
 
         if (isUsingDB()) {
+            // Actualizamos específicamente el documento con ID fijo
             const data = await Content.findOneAndUpdate(
-                {},
+                { _id: SINGLE_CONTENT_ID },
                 { $set: normalized },
                 { upsert: true, new: true, setDefaultsOnInsert: true }
             );
-            console.log('✅ Contenido guardado en MongoDB con éxito');
+            console.log('✅ Contenido guardado en MongoDB con ID fijo');
             return res.json(data);
         }
         
@@ -415,13 +425,19 @@ app.listen(PORT, () => {
 // Semilla inicial y directorios
 async function seedDatabase() {
     try {
-        const count = await Content.countDocuments();
+        const count = await Content.countDocuments({ _id: SINGLE_CONTENT_ID });
         if (count > 0) return;
 
         const fallbackContent = await fs.readJson(CONTENT_PATH);
-        await Content.create(normalizeContentShape(fallbackContent));
-        console.log('Contenido inicial sembrado en MongoDB.');
+        const normalized = normalizeContentShape(fallbackContent);
+        
+        await Content.findOneAndUpdate(
+            { _id: SINGLE_CONTENT_ID },
+            { $set: normalized },
+            { upsert: true }
+        );
+        console.log('✅ Contenido inicial sembrado en MongoDB con ID fijo.');
     } catch (err) {
-        console.warn('No se pudo sembrar el contenido inicial:', err.message);
+        console.warn('⚠️ No se pudo sembrar el contenido inicial:', err.message);
     }
 }

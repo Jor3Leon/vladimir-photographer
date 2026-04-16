@@ -90,10 +90,14 @@ function getYouTubeId(url) {
 function YouTubeThumb({ video, resolvedUrl }) {
   const videoId = getYouTubeId(video.url || resolvedUrl);
   const thumbUrl = videoId ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg` : '';
+  const watchUrl = videoId ? `https://www.youtube.com/watch?v=${videoId}` : (video.url || resolvedUrl);
 
   return (
-    <div
-      className="relative block w-full h-full group bg-black"
+    <a
+      href={watchUrl}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="relative block w-full h-full group bg-black cursor-pointer overflow-hidden"
     >
       {thumbUrl ? (
         <img
@@ -107,13 +111,17 @@ function YouTubeThumb({ video, resolvedUrl }) {
       )}
       <div className="absolute inset-0 bg-black/30 group-hover:bg-black/20 transition-colors" />
       <div className="absolute inset-0 flex items-center justify-center">
-        <div className="w-16 h-16 rounded-full border border-white/20 bg-black/40 backdrop-blur-md flex items-center justify-center shadow-2xl">
+        <div className="w-16 h-16 rounded-full border border-white/20 bg-black/40 backdrop-blur-md flex items-center justify-center shadow-2xl transition-transform group-hover:scale-110">
           <svg viewBox="0 0 24 24" className="w-7 h-7 text-white/85 translate-x-0.5">
             <path fill="currentColor" d="M8 5v14l11-7z" />
           </svg>
         </div>
       </div>
-    </div>
+      {/* Indicador de ver en YouTube al fallar */}
+      <div className="absolute bottom-4 right-4 text-[10px] font-bold uppercase tracking-widest text-white/40 bg-black/50 px-3 py-1.5 rounded-lg border border-white/5 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity">
+        Ver en YouTube
+      </div>
+    </a>
   );
 }
 
@@ -140,6 +148,8 @@ function YouTubePlayer({ video, resolvedUrl }) {
       }
 
       playerRef.current = new window.YT.Player(containerRef.current, {
+        height: '100%',
+        width: '100%',
         videoId: videoId,
         playerVars: {
           rel: 0,

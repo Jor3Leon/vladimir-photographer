@@ -186,19 +186,15 @@ export default function Admin() {
     // Guarda todos los cambios realizados en el contenido
     const handleSave = async () => {
         try {
-            const response = await fetch(`${API_URL}/api/content`, {
-                method: 'POST',
-                headers: authHeaders(),
-                body: JSON.stringify(data)
-            });
-            if (response.status === 401) return handleUnauthorized();
-            if (response.ok) {
-                const saved = await response.json();
+            const saved = await api.updateContent(data);
+            if (saved) {
                 setData(saved);
-                alert('Cambios guardados con éxito.');
+                alert('✅ Cambios guardados con éxito en el servidor.');
+                void fetchStatus();
             }
-        } catch {
-            alert('Error al guardar los cambios.');
+        } catch (error) {
+            console.error('Error al guardar:', error);
+            alert('❌ ERROR: No se pudieron guardar los cambios. Revisa tu conexión.');
         }
     };
 
@@ -370,6 +366,20 @@ export default function Admin() {
                     </div>
                 </div>
             </nav>
+
+            {/* Aviso de Persistencia Crítica */}
+            {storageStatus.mode === 'ephemeral' && (
+                <div className="bg-red-600/90 text-white p-4 text-center font-black uppercase text-xs tracking-widest animate-pulse sticky top-[89px] z-40 shadow-2xl backdrop-blur-md">
+                    ⚠️ ALERTA: MODO EFÍMERO ACTIVO. Los cambios se perderán al reiniciar el servidor. 
+                    <span className="underline ml-2 hidden sm:inline">Configura MONGODB_URI en Render inmediatamente.</span>
+                </div>
+            )}
+            
+            {storageStatus.mode === 'persistent' && (
+                <div className="bg-green-600/20 text-green-400 p-2 text-center font-bold uppercase text-[9px] tracking-widest sticky top-[89px] z-40 backdrop-blur-sm border-b border-green-500/10">
+                    🟢 Sistema Conectado a Base de Datos (Persistencia Real)
+                </div>
+            )}
 
             <main className="container mx-auto px-6 py-12 max-w-6xl">
                 {currentView === 'mailbox' ? (

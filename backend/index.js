@@ -267,6 +267,16 @@ app.post('/api/auth/login', (req, res) => {
 
 app.get('/api/auth/session', requireAdmin, (req, res) => res.json({ ok: true }));
 
+// Ruta de estado del sistema (Health check y Storage mode)
+app.get('/api/status', (req, res) => {
+    res.json({
+        database: isUsingDB() ? 'connected' : 'disconnected',
+        cloudinary: hasCloudinaryConfig ? 'configured' : 'not_configured',
+        storageMode: isUsingDB() ? 'persistent' : 'ephemeral',
+        timestamp: new Date().toISOString()
+    });
+});
+
 // Rutas de Contenido (Hero, About, etc.)
 app.get('/api/content', async (req, res) => {
     try {

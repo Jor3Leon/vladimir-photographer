@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { PlayCircle } from 'lucide-react';
 
@@ -120,6 +120,82 @@ function YouTubeThumb({ video, resolvedUrl }) {
 function YouTubePlayer({ video, resolvedUrl }) {
   const [loadState, setLoadState] = useState('loading');
   const videoId = getYouTubeId(video.url || resolvedUrl);
+  const containerRef = useRef(null);
+  const playerRef = useRef(null);
+
+  useEffect(() => {
+    if (!videoId) {
+      setLoadState('error');
+      return;
+    }
+
+    let isMounted = true;
+
+    const initPlayer = () => {
+      if (!window.YT || !window.YT.Player) return;
+
+      // Destruir player anterior si existe
+      if (playerRef.current && playerRef.current.destroy) {
+        playerRef.current.destroy();
+      }
+
+      playerRef.current = new window.YT.Player(containerRef.current, {
+        videoId: videoId,
+        playerVars: {
+          rel: 0,
+          modestbranding: 1,
+          origin: window.location.origin,
+        },
+        events: {
+          onReady: () => {
+            if (isMounted) setLoadState('ready');
+          },
+          onError: (event) => {
+            // Códigos de error de YouTube:
+            // 101/150: El propietario no permite la reproducción en reproductores insertados (bloqueo).
+            // 100: Video no encontrado o privado.
+            console.warn(`YouTube Player Error (${videoId}):`, event.data);
+            if (isMounted) setLoadState('error');
+          }
+        }
+      });
+    };
+
+    // Cargar script de la API si no existe
+    if (!window.YT) {
+      if (!window._youtubeApiPromise) {
+        window._youtubeApiPromise = new Promise((resolve) => {
+          const tag = document.createElement('script');
+          tag.src = "https://www.youtube.com/iframe_api";
+          const firstScriptTag = document.getElementsByTagName('script')[0];
+          firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+          
+          const existingCallback = window.onYouTubeIframeAPIReady;
+          window.onYouTubeIframeAPIReady = () => {
+            if (existingCallback) existingCallback();
+            resolve();
+          };
+        });
+      }
+      window._youtubeApiPromise.then(() => {
+        if (isMounted) initPlayer();
+      });
+    } else {
+      initPlayer();
+    }
+
+    return () => {
+      isMounted = false;
+      if (playerRef.current && playerRef.current.destroy) {
+        try {
+          playerRef.current.destroy();
+        } catch (e) {
+          console.error("Error destroying YT player", e);
+        }
+      }
+    };
+  }, [videoId]);
+
   const thumbUrl = videoId ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg` : '';
 
   if (loadState === 'error') {
@@ -130,27 +206,23 @@ function YouTubePlayer({ video, resolvedUrl }) {
 
   return (
     <div className="relative w-full h-full bg-black">
-      <iframe
-        src={resolvedUrl}
-        title={video.title || 'Video'}
-        className="absolute inset-0 w-full h-full"
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-        allowFullScreen
-        onLoad={() => setLoadState('ready')}
-        onError={() => setLoadState('error')}
-      />
+      {/* Contenedor para el iframe de la API */}
+      <div className="absolute inset-0 w-full h-full">
+        <div ref={containerRef} />
+      </div>
+
       {loadState === 'loading' && (
-        <div className="absolute inset-0 bg-black/70">
+        <div className="absolute inset-0 bg-black/70 z-10 pointer-events-none">
           {thumbUrl ? (
             <img
               src={thumbUrl}
-              alt={video.title || 'Video'}
+              alt={video.title || 'Cargando video...'}
               className="w-full h-full object-cover opacity-35"
               loading="lazy"
             />
           ) : null}
           <div className="absolute inset-0 flex items-center justify-center">
-            <PlayCircle className="w-16 h-16 text-white/80 drop-shadow-2xl" />
+            <div className="w-12 h-12 border-4 border-white/20 border-t-[#8b5e34] rounded-full animate-spin" />
           </div>
         </div>
       )}

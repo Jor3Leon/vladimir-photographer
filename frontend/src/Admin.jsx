@@ -38,14 +38,15 @@ export default function Admin() {
     const [currentView, setCurrentView] = useState('content'); // Vista: 'content' (editor) o 'mailbox' (mensajes)
     const [messages, setMessages] = useState([]); // Lista de mensajes recibidos
     const [token, setToken] = useState(() => localStorage.getItem(TOKEN_KEY) || ''); // Token de sesión
+    const [storageStatus, setStorageStatus] = useState({ mode: 'checking', db: 'unknown' }); // Estado de persistencia
 
     // --- Ayudantes de Autenticación ---
     
     // Genera las cabeceras con el token de portador
-    const authHeaders = () => ({
+    const authHeaders = useCallback(() => ({
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`
-    });
+    }), [token]);
     
     // Cierra la sesión y limpia el almacenamiento local
     const logout = useCallback(() => {
@@ -62,6 +63,22 @@ export default function Admin() {
     }, [logout]);
 
     // --- Funciones de Obtención de Datos ---
+
+    // Obtener estado del servidor (Base de datos y Storage)
+    const fetchStatus = useCallback(async () => {
+        try {
+            const res = await fetch(`${API_URL}/api/status`);
+            if (!res.ok) throw new Error();
+            const json = await res.json();
+            setStorageStatus({ 
+                mode: json.storageMode, 
+                db: json.database,
+                cloudinary: json.cloudinary 
+            });
+        } catch {
+            setStorageStatus({ mode: 'unknown', db: 'error', cloudinary: 'unknown' });
+        }
+    }, [API_URL]);
 
     // Obtiene los mensajes del buzón
     const fetchMessages = useCallback(async () => {
@@ -85,7 +102,9 @@ export default function Admin() {
         api.fetchContent()
             .then(json => setData(json))
             .catch(err => console.error('Error al obtener contenido:', err));
-    }, []);
+        
+        void fetchStatus();
+    }, [fetchStatus]);
 
     // --- Validación de Sesión ---
     useEffect(() => {
@@ -378,6 +397,12 @@ export default function Admin() {
             {storageStatus.mode === 'persistent' && (
                 <div className="bg-green-600/20 text-green-400 p-2 text-center font-bold uppercase text-[9px] tracking-widest sticky top-[89px] z-40 backdrop-blur-sm border-b border-green-500/10">
                     🟢 Sistema Conectado a Base de Datos (Persistencia Real)
+                </div>
+            )}
+
+            {storageStatus.cloudinary === 'not_configured' && (
+                <div className="bg-amber-600/20 text-amber-500 p-2 text-center font-bold uppercase text-[9px] tracking-widest border-b border-amber-500/10 sticky top-[125px] z-30 backdrop-blur-sm">
+                    ⚠️ Aviso: Cloudinary no detectado. Las fotos nuevas se borrarán si el servidor se reinicia.
                 </div>
             )}
 

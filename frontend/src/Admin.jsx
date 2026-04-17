@@ -308,6 +308,19 @@ export default function Admin() {
         setData(prev => ({ ...prev, categorized_gallery: newCats }));
     };
 
+    const addCategory = () => {
+        setData(prev => ({
+            ...prev,
+            categorized_gallery: [...prev.categorized_gallery, { category: 'Nueva Categoría', photos: [] }]
+        }));
+    };
+
+    const removeCategory = (index) => {
+        if (!window.confirm('¿Estás seguro de eliminar esta categoría completa y todas sus fotos?')) return;
+        const newCats = data.categorized_gallery.filter((_, i) => i !== index);
+        setData(prev => ({ ...prev, categorized_gallery: newCats }));
+    };
+
     const addVideo = () => {
         setData(prev => ({
             ...prev,
@@ -890,10 +903,18 @@ export default function Admin() {
                         </section>
 
                         <section className="mb-12">
-                            <h2 className="text-2xl font-bold mb-10 flex items-center gap-4 uppercase tracking-[0.2em] text-[#d4a373]">
-                                <div className="w-16 h-[4px] bg-[#8b5e34] rounded-full"></div>
-                                Galería Completa por Categorías
-                            </h2>
+                            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-10">
+                                <h2 className="text-2xl font-bold flex items-center gap-4 uppercase tracking-[0.2em] text-[#d4a373]">
+                                    <div className="w-16 h-[4px] bg-[#8b5e34] rounded-full"></div>
+                                    Galería Completa por Categorías
+                                </h2>
+                                <button
+                                    onClick={addCategory}
+                                    className="flex items-center gap-3 bg-[#8b5e34] px-8 py-3 rounded-full font-black uppercase text-[10px] tracking-widest shadow-xl shadow-[#8b5e34]/20 hover:scale-105 active:scale-95 transition-all"
+                                >
+                                    <Plus size={16} /> Nueva Categoría
+                                </button>
+                            </div>
                             {data.categorized_gallery.map((cat, catIdx) => (
                                 <motion.div 
                                     initial={{ opacity: 0, scale: 0.98 }}
@@ -905,11 +926,20 @@ export default function Admin() {
                                     <div className="flex flex-col md:flex-row justify-between items-center mb-10 pb-6 border-b border-white/5 space-y-4 md:space-y-0">
                                         <div className="flex items-center gap-6 group">
                                             <div className="w-12 h-12 rounded-2xl bg-[#8b5e34] flex items-center justify-center font-black text-xl shadow-lg shadow-[#8b5e34]/20">{catIdx + 1}</div>
-                                            <input
-                                                className="text-2xl font-black bg-transparent border-b-2 border-transparent focus:border-[#8b5e34] outline-none text-[#d4a373] uppercase tracking-[0.4em] w-80 transition-all uppercase"
-                                                value={cat.category}
-                                                onChange={(e) => updateCategoryName(catIdx, e.target.value)}
-                                            />
+                                            <div className="flex items-center gap-2">
+                                                <input
+                                                    className="text-2xl font-black bg-transparent border-b-2 border-transparent focus:border-[#8b5e34] outline-none text-[#d4a373] uppercase tracking-[0.4em] w-80 transition-all uppercase"
+                                                    value={cat.category}
+                                                    onChange={(e) => updateCategoryName(catIdx, e.target.value)}
+                                                />
+                                                <button
+                                                    onClick={() => removeCategory(catIdx)}
+                                                    className="p-2 text-white/10 hover:text-red-500 transition-colors"
+                                                    title="Eliminar Categoría"
+                                                >
+                                                    <Trash2 size={24} />
+                                                </button>
+                                            </div>
                                         </div>
                                         <button
                                             onClick={() => addPhotoToCategory(catIdx)}

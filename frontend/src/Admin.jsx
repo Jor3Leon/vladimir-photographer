@@ -8,7 +8,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { Save, LogOut, ArrowLeft, Plus, Trash2, Image as ImageIcon, Inbox, Check, MessageSquare, Clock, Mail, AlertCircle, Camera } from 'lucide-react';
+import { Save, LogOut, ArrowLeft, Plus, Trash2, Image as ImageIcon, Inbox, Check, MessageSquare, Clock, Mail, AlertCircle, Camera, ChevronUp, ChevronDown } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { api } from './api';
 
@@ -272,6 +272,17 @@ export default function Admin() {
         setData(prev => ({ ...prev, [section]: newItems }));
     };
 
+    // Reordena un elemento dentro de una sección
+    const moveItem = (section, index, direction) => {
+        const newItems = [...data[section]];
+        const nextIndex = direction === 'up' ? index - 1 : index + 1;
+        
+        if (nextIndex >= 0 && nextIndex < newItems.length) {
+            [newItems[index], newItems[nextIndex]] = [newItems[nextIndex], newItems[index]];
+            setData(prev => ({ ...prev, [section]: newItems }));
+        }
+    };
+
     // Funciones específicas para la Galería Categorizada
     const updateCategoryName = (index, name) => {
         const newCats = [...data.categorized_gallery];
@@ -301,6 +312,13 @@ export default function Admin() {
         setData(prev => ({
             ...prev,
             videos: [...prev.videos, { id: Date.now(), title: '', url: '' }]
+        }));
+    };
+
+    const addExperience = () => {
+        setData(prev => ({
+            ...prev,
+            experiences: [...prev.experiences, { id: Date.now(), year: '', title: '', place: '' }]
         }));
     };
 
@@ -792,6 +810,85 @@ export default function Admin() {
                         </section>
                         
                         {/* GESTIÓN DE CATEGORÍAS (Galería Completa) */}
+                        <section className="mb-12">
+                            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-10">
+                                <h2 className="text-2xl font-bold flex items-center gap-4 uppercase tracking-[0.2em] text-[#d4a373]">
+                                    <div className="w-10 h-[2px] bg-[#8b5e34]"></div>
+                                    Experiencia
+                                </h2>
+                                <button
+                                    onClick={addExperience}
+                                    className="flex items-center gap-3 bg-[#8b5e34] px-8 py-3 rounded-full font-black uppercase text-[10px] tracking-widest shadow-xl shadow-[#8b5e34]/20 hover:scale-105 active:scale-95 transition-all"
+                                >
+                                    <Plus size={16} /> Añadir Experiencia
+                                </button>
+                            </div>
+
+                            <div className="grid gap-6">
+                                {data.experiences.map((experience, index) => (
+                                    <motion.div
+                                        layout
+                                        key={experience.id || index}
+                                        className="bg-[#1e1610] p-6 md:p-8 rounded-[2rem] border border-white/10 shadow-2xl overflow-hidden"
+                                    >
+                                        <div className="flex items-center justify-between gap-4 mb-6">
+                                            <div className="flex items-center gap-6">
+                                                <div className="flex items-center gap-3 text-[#d4a373] uppercase tracking-[0.2em] text-[10px] font-black">
+                                                    <Clock size={16} />
+                                                    Entrada {index + 1}
+                                                </div>
+                                                <div className="flex items-center gap-2 border-l border-white/10 pl-4">
+                                                    <button
+                                                        onClick={() => moveItem('experiences', index, 'up')}
+                                                        disabled={index === 0}
+                                                        className={`p-2 rounded-lg transition-all ${index === 0 ? 'opacity-20 cursor-not-allowed' : 'bg-white/5 hover:bg-[#8b5e34] text-white/50 hover:text-white'}`}
+                                                        title="Mover arriba"
+                                                    >
+                                                        <ChevronUp size={16} />
+                                                    </button>
+                                                    <button
+                                                        onClick={() => moveItem('experiences', index, 'down')}
+                                                        disabled={index === data.experiences.length - 1}
+                                                        className={`p-2 rounded-lg transition-all ${index === data.experiences.length - 1 ? 'opacity-20 cursor-not-allowed' : 'bg-white/5 hover:bg-[#8b5e34] text-white/50 hover:text-white'}`}
+                                                        title="Mover abajo"
+                                                    >
+                                                        <ChevronDown size={16} />
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <button
+                                                onClick={() => removeItem('experiences', index)}
+                                                className="text-white/10 hover:text-red-500 transition-colors bg-white/5 p-3 rounded-xl"
+                                            >
+                                                <Trash2 size={16} />
+                                            </button>
+                                        </div>
+
+                                        <div className="grid md:grid-cols-12 gap-4">
+                                            <input
+                                                className="md:col-span-2 w-full bg-[#120d09] border border-white/5 p-4 rounded-2xl text-sm font-black uppercase tracking-[0.2em] outline-none focus:border-[#8b5e34] transition-all text-center"
+                                                placeholder="Año"
+                                                value={experience.year}
+                                                onChange={(e) => updateItem('experiences', index, 'year', e.target.value)}
+                                            />
+                                            <input
+                                                className="md:col-span-5 w-full bg-[#120d09] border border-white/5 p-4 rounded-2xl text-sm font-bold outline-none focus:border-[#8b5e34] transition-all"
+                                                placeholder="Título de la experiencia"
+                                                value={experience.title}
+                                                onChange={(e) => updateItem('experiences', index, 'title', e.target.value)}
+                                            />
+                                            <input
+                                                className="md:col-span-5 w-full bg-[#120d09] border border-white/5 p-4 rounded-2xl text-sm font-medium outline-none focus:border-[#8b5e34] transition-all"
+                                                placeholder="Lugar o proyecto"
+                                                value={experience.place}
+                                                onChange={(e) => updateItem('experiences', index, 'place', e.target.value)}
+                                            />
+                                        </div>
+                                    </motion.div>
+                                ))}
+                            </div>
+                        </section>
+
                         <section className="mb-12">
                             <h2 className="text-2xl font-bold mb-10 flex items-center gap-4 uppercase tracking-[0.2em] text-[#d4a373]">
                                 <div className="w-16 h-[4px] bg-[#8b5e34] rounded-full"></div>

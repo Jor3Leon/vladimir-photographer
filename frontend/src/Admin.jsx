@@ -8,14 +8,14 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { Save, LogOut, ArrowLeft, Plus, Trash2, Image as ImageIcon, Inbox, Check, MessageSquare, Clock, Mail, AlertCircle, Camera, ChevronUp, ChevronDown } from 'lucide-react';
+import { Save, LogOut, ArrowLeft, Plus, Trash2, Image as ImageIcon, Inbox, Check, MessageSquare, Clock, Mail, AlertCircle, Camera, ChevronUp, ChevronDown, MapPin } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { api } from './api';
 
 // Estructura de datos inicial vacía para evitar errores de renderizado
 const skeletonData = {
     hero: { name: '', title: '', description: '', image: '', cta: '' },
-    about: { title: '', content: '', image: '' },
+    about: { title: '', content: '', image: '', badge1: '10+ Años Exp.', badge2: 'Global Work' },
     skills: [],
     gallery: [],
     categorized_gallery: [],
@@ -622,6 +622,30 @@ export default function Admin() {
                                         value={data.about.content}
                                         onChange={(e) => updateNested('about', 'content', e.target.value)}
                                     />
+                                </div>
+                                <div className="grid md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label className="text-[10px] font-black uppercase tracking-widest text-white/30 mb-3 block text-[#d4a373]">Etiqueta 1 (Experiencia)</label>
+                                        <div className="flex items-center gap-3 bg-[#120d09] border border-white/10 p-3 rounded-xl">
+                                            <Camera size={18} className="text-[#8b5e34]" />
+                                            <input
+                                                className="w-full bg-transparent outline-none font-bold text-sm"
+                                                value={data.about.badge1 || ''}
+                                                onChange={(e) => updateNested('about', 'badge1', e.target.value)}
+                                            />
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label className="text-[10px] font-black uppercase tracking-widest text-white/30 mb-3 block text-[#d4a373]">Etiqueta 2 (Ubicación/Alcance)</label>
+                                        <div className="flex items-center gap-3 bg-[#120d09] border border-white/10 p-3 rounded-xl">
+                                            <MapPin size={18} className="text-[#8b5e34]" />
+                                            <input
+                                                className="w-full bg-transparent outline-none font-bold text-sm"
+                                                value={data.about.badge2 || ''}
+                                                onChange={(e) => updateNested('about', 'badge2', e.target.value)}
+                                            />
+                                        </div>
+                                    </div>
                                 </div>
                                 <div className="grid md:grid-cols-2 gap-8 items-start">
                                     <div>

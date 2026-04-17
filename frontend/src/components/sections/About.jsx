@@ -85,11 +85,11 @@ const About = ({ content, skills }) => {
                       <div className="flex flex-wrap gap-3 pt-2">
                         <div className="px-4 py-2 bg-white/5 rounded-full border border-white/10 flex items-center gap-2">
                           <Camera size={14} className="text-[#8b5e34]" />
-                          <span className="text-[10px] font-medium">10+ Años Exp.</span>
+                          <span className="text-[10px] font-medium">{content.badge1 || '10+ Años Exp.'}</span>
                         </div>
                         <div className="px-4 py-2 bg-white/5 rounded-full border border-white/10 flex items-center gap-2">
                           <MapPin size={14} className="text-[#8b5e34]" />
-                          <span className="text-[10px] font-medium">Global Work</span>
+                          <span className="text-[10px] font-medium">{content.badge2 || 'Global Work'}</span>
                         </div>
                       </div>
                     </div>

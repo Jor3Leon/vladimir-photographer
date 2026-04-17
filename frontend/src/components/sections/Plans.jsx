@@ -51,7 +51,7 @@ const Plans = ({ plans, onSelectPlan }) => (
             {/* Contenido del Plan */}
             <div className="relative z-10 flex flex-col h-full">
               <h3 className="text-3xl font-bold mb-2 tracking-tight text-white/90">{plan.name}</h3>
-              <div className="mb-8 price flex flex-nowrap items-baseline justify-center gap-1 whitespace-nowrap overflow-hidden text-[clamp(1.2rem,6vw,2.8rem)] sm:text-5xl font-bold leading-none tracking-tight text-white/80">
+              <div className="mb-8 price flex flex-nowrap items-baseline justify-center gap-1 whitespace-nowrap overflow-hidden text-[clamp(1.1rem,4.5vw,2rem)] sm:text-4xl md:text-[clamp(1rem,2.5vw,2.2rem)] lg:text-5xl font-bold leading-none tracking-tight text-white/80">
                 <span className="shrink-0 text-[0.7em] font-light opacity-40">$</span>
                 <span className="shrink-0 tabular-nums">
                   {plan.price.replace('$', '')}

@@ -14,7 +14,9 @@ const ContentSchema = new mongoose.Schema({
     about: {
         title: String,
         content: String,
-        image: String
+        image: String,
+        badge1: String,
+        badge2: String
     },
     // Skills section
     skills: [{
